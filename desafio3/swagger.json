@@ -10,6 +10,87 @@
       "url": "http://localhost:3000"
     }
   ],
+  "components": {
+    "schemas": {
+      "LoginRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "usuario@email.com"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 12,
+            "maxLength": 16,
+            "pattern": "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+\-=[\]{};':\\\"|,.<>/?]).{12,16}$",
+            "example": "SenhaForte123!"
+          }
+        }
+      },
+      "RememberPasswordRequest": {
+        "type": "object",
+        "required": ["email"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "usuario@email.com"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": { "type": "string", "example": "Mensagem de erro descritiva." }
+        }
+      }
+    },
+    "responses": {
+      "InternalServerError": {
+        "description": "Internal Server Error. Ocorreu um erro inesperado no servidor.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "Bad Request. Requisição mal formatada ou campos obrigatórios ausentes.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Unauthorized. Credenciais incorretas.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Forbidden. Usuário sem permissão.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Not Found. Usuário não encontrado.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+          }
+        }
+      }
+    }
+  },
   "paths": {
     "/login": {
       "post": {
@@ -19,12 +100,10 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "username": { "type": "string" },
-                  "password": { "type": "string" }
-                }
+              "schema": { "$ref": "#/components/schemas/LoginRequest" },
+              "example": {
+                "username": "usuario123",
+                "password": "senhaSegura!"
               }
             }
           }
@@ -33,11 +112,11 @@
           "200": { "description": "OK. Login bem-sucedido." },
           "201": { "description": "Created. Login realizado e sessão criada (caso aplicável)." },
           "203": { "description": "Non-Authoritative Information. Login realizado, mas informações retornadas podem ser parciais." },
-          "400": { "description": "Bad Request. A requisição está mal formatada ou faltam campos obrigatórios (username/senha)." },
-          "401": { "description": "Unauthorized. As credenciais fornecidas (username ou senha) estão incorretas." },
-          "403": { "description": "Forbidden. O usuário está ativo, mas não tem permissão para acessar o recurso (caso aplicável)." },
-          "429": { "description": "Too Many Requests. A conta foi bloqueada temporariamente devido a múltiplas tentativas de login falhas." },
-          "500": { "description": "Internal Server Error. Ocorreu um erro inesperado no servidor." }
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "429": { "description": "Too Many Requests. Conta bloqueada temporariamente por múltiplas tentativas." },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
         }
       }
     },
@@ -49,11 +128,9 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "username": { "type": "string" }
-                }
+              "schema": { "$ref": "#/components/schemas/RememberPasswordRequest" },
+              "example": {
+                "username": "usuario123"
               }
             }
           }
@@ -62,10 +139,33 @@
           "200": { "description": "OK. Instruções de recuperação enviadas." },
           "201": { "description": "Created. Solicitação de recuperação criada com sucesso." },
           "203": { "description": "Non-Authoritative Information. Solicitação processada, mas informações podem ser parciais." },
-          "400": { "description": "Bad Request. A requisição está mal formatada ou falta o campo obrigatório (username)." },
-          "403": { "description": "Forbidden. O usuário não tem permissão para solicitar recuperação de senha (caso aplicável)." },
-          "404": { "description": "Not Found. Usuário não encontrado." },
-          "500": { "description": "Internal Server Error. Ocorreu um erro inesperado no servidor." }
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/register": {
+      "post": {
+        "summary": "Cadastro de novo usuário",
+        "description": "Permite que um novo usuário se cadastre informando username e password.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LoginRequest" },
+              "example": {
+                "username": "novoUsuario",
+                "password": "senhaForte123"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Created. Usuário cadastrado com sucesso." },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
         }
       }
     }
