@@ -4,36 +4,21 @@ const swaggerUi = require("swagger-ui-express");
 
 const swaggerDocument = require("./swagger.json");
 
-const swaggerJsdoc = require("swagger-jsdoc");
 const userRoutes = require("./src/routes/userRoutes");
 
 const app = express();
 
-// CORS configuration
+// CORS configuration - more permissive for debugging
 app.use(cors({
-  origin: ['https://dotch3.github.io', 'http://localhost:3000', 'http://localhost:8080'],
+  origin: true, // Allow all origins for now
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
 }));
 
 app.use(express.json());
 
-// Swagger config
-const swaggerOptions = {
-  swaggerDefinition: {
-    openapi: "3.0.0",
-    info: {
-      title: "API Login de Usuários",
-      version: "1.0.0",
-      description: "API para gestão de login de usuários",
-    },
-    servers: [{ url: "http://localhost:3000" }],
-  },
-  apis: ["./routes/*.js"],
-};
-const swaggerSpec = swaggerJsdoc(swaggerOptions);
-
+// Swagger UI setup
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Rotas
