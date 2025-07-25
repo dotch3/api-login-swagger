@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:3000"
+      "url": "https://api-login-swagger-fvoqay9co-dotch3s-projects.vercel.app"
     }
   ],
   "components": {
