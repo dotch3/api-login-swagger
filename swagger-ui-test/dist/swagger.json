@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "https://api-login-swagger-fvoqay9co-dotch3s-projects.vercel.app"
+      "url": "https://api-login-swagger.onrender.com"
     }
   ],
   "components": {
