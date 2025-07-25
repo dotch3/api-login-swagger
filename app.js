@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const swaggerUi = require("swagger-ui-express");
 
 const swaggerDocument = require("./swagger.json");
@@ -7,6 +8,15 @@ const swaggerJsdoc = require("swagger-jsdoc");
 const userRoutes = require("./src/routes/userRoutes");
 
 const app = express();
+
+// CORS configuration
+app.use(cors({
+  origin: ['https://dotch3.github.io', 'http://localhost:3000', 'http://localhost:8080'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
 // Swagger config
